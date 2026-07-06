@@ -1,0 +1,180 @@
+<div class="wizard">
+  <ol class="stepper" aria-label="Progress">
+    <li [class.active]="isActive('address')" [class.done]="isDone('address')">
+      <span class="dot">1</span><span class="label">Address</span>
+    </li>
+    <li [class.active]="isActive('roof')" [class.done]="isDone('roof')">
+      <span class="dot">2</span><span class="label">Roof</span>
+    </li>
+    <li [class.active]="isActive('obstacles')" [class.done]="isDone('obstacles')">
+      <span class="dot">3</span><span class="label">Obstacles</span>
+    </li>
+    <li [class.active]="isActive('production')" [class.done]="isDone('production')">
+      <span class="dot">4</span><span class="label">Production</span>
+    </li>
+    <li [class.active]="isActive('result')" [class.done]="isDone('result')">
+      <span class="dot">5</span><span class="label">Result</span>
+    </li>
+  </ol>
+
+  @switch (step()) {
+    @case ('search') {
+      <section class="panel">
+        <h2 class="panel-title">Find the property</h2>
+        <p class="panel-sub">Search for an address to place it on the satellite map.</p>
+
+        <div class="search-row">
+          <input
+            class="text-input"
+            type="text"
+            [(ngModel)]="query"
+            (keydown.enter)="search()"
+            placeholder="e.g. Ilica 1, Zagreb"
+            aria-label="Property address"
+          />
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="search()"
+            [disabled]="searching() || query.trim().length < minQueryLength"
+          >
+            {{ searching() ? 'Searching…' : 'Search' }}
+          </button>
+        </div>
+
+        @if (query.trim().length > 0 && query.trim().length < minQueryLength) {
+          <p class="msg">Type at least {{ minQueryLength }} characters to search.</p>
+        }
+
+        @if (searchError()) {
+          <p class="msg error">{{ searchError() }}</p>
+        }
+
+        @if (searchResults().length) {
+          <ul class="results">
+            @for (r of searchResults(); track r.displayName) {
+              <li>
+                <button type="button" class="result-item" (click)="selectLocation(r)">
+                  <span class="result-name">{{ r.displayName }}</span>
+                  <span class="result-coords">
+                    {{ r.lat | number: '1.4-4' }}, {{ r.lon | number: '1.4-4' }}
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        } @else if (hasSearched() && !searching() && !searchError()) {
+          <p class="msg">No matching addresses. Try adding a city or country.</p>
+        }
+      </section>
+    }
+
+    @case ('draw') {
+      <section class="panel">
+        <div class="panel-head-row">
+          <div>
+            <h2 class="panel-title">{{ roof() ? 'Mark obstacles (optional)' : 'Trace the roof' }}</h2>
+            @if (roof()) {
+              <p class="panel-sub">
+                Roof captured. Optionally draw obstacles (chimneys, skylights, unusable sections)
+                fully inside the roof; they cannot overlap. Use the bin tool to remove a shape,
+                or skip straight to calculating.
+              </p>
+            } @else {
+              <p class="panel-sub">
+                Pick the polygon tool at the top-right of the map, click each corner of the roof,
+                then close the shape on the first point.
+              </p>
+            }
+          </div>
+          <button type="button" class="btn-ghost" (click)="backToSearch()">Change address</button>
+        </div>
+
+        @if (location(); as loc) {
+          <app-map-drawing
+            [center]="loc"
+            [initialRoof]="roof()?.feature ?? null"
+            [initialObstacles]="obstacleFeatures()"
+            (roofChange)="onRoofChange($event)"
+            (obstaclesChange)="onObstaclesChange($event)"
+            (notice)="onNotice($event)"
+          />
+        }
+
+        @if (mapNotice(); as note) {
+          <p class="msg error">{{ note }}</p>
+        }
+
+        @if (breakdown(); as b) {
+          <dl class="live-metrics">
+            <div><dt>Roof area</dt><dd>{{ b.roofAreaM2 | number: '1.0-1' }} m²</dd></div>
+            <div>
+              <dt>Obstacles</dt>
+              <dd>{{ obstacles().length }} ({{ b.obstacleAreaM2 | number: '1.0-1' }} m²)</dd>
+            </div>
+            <div><dt>Available</dt><dd>{{ b.availableAreaM2 | number: '1.0-1' }} m²</dd></div>
+            <div><dt>Usable</dt><dd>{{ b.usableAreaM2 | number: '1.0-1' }} m²</dd></div>
+            <div><dt>Panels</dt><dd>{{ b.panelCount | number: '1.0-0' }}</dd></div>
+          </dl>
+        } @else {
+          <p class="msg">No roof outlined yet.</p>
+        }
+
+        <div class="pv-settings">
+          <label class="field">
+            <span class="field-label">Panel tilt <span class="unit">(degrees)</span></span>
+            <input
+              class="text-input"
+              type="number"
+              min="0"
+              max="90"
+              step="1"
+              [ngModel]="tiltDeg()"
+              (ngModelChange)="onTiltInput($event)"
+              aria-label="Panel tilt in degrees"
+            />
+          </label>
+          <label class="field">
+            <span class="field-label">Panel aspect <span class="unit">(azimuth)</span></span>
+            <input
+              class="text-input"
+              type="number"
+              min="-180"
+              max="180"
+              step="1"
+              [ngModel]="aspectDeg()"
+              (ngModelChange)="onAspectInput($event)"
+              aria-label="Panel aspect (azimuth)"
+            />
+            <span class="field-help">0 = south, 90 = west, -90 = east</span>
+          </label>
+        </div>
+
+        <div class="draw-actions">
+          @if (breakdown() && !canCalculate()) {
+            <span class="msg">Usable area fits no full panel yet. Enlarge the roof or remove obstacles.</span>
+          }
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="calculateSolarPotential()"
+            [disabled]="!canCalculate()"
+          >
+            Calculate solar potential
+          </button>
+        </div>
+      </section>
+    }
+
+    @case ('result') {
+      @if (report(); as rep) {
+        <app-result-dashboard
+          [report]="rep"
+          [pvgisLoading]="pvgisLoading()"
+          [pvgisError]="pvgisError()"
+          (restart)="restart()"
+        />
+      }
+    }
+  }
+</div>

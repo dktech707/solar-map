@@ -1,0 +1,157 @@
+@let loc = report().location;
+@let res = report().result;
+
+<div class="dashboard">
+  <header class="dash-head">
+    <p class="eyebrow">Solar estimate</p>
+    <h2 class="address">{{ loc.displayName }}</h2>
+  </header>
+
+  <section class="hero">
+    <p class="hero-label">Estimated annual production</p>
+
+    @if (pvgisLoading()) {
+      <p class="hero-value muted">Contacting PVGIS…</p>
+    } @else if (hasProduction()) {
+      <p class="hero-value">
+        <span class="num">{{ res.annualProductionKwh | number: '1.0-0' }}</span>
+        <span class="unit">kWh<span class="per">/year</span></span>
+      </p>
+      <p class="hero-sub">
+        Modelled by PVGIS for a {{ res.systemPowerKwp | number: '1.1-2' }} kWp fixed system at
+        {{ res.tiltDeg }}&deg; tilt, {{ res.aspectDeg }}&deg; aspect and
+        {{ constants.systemLossPercent }}% system losses.
+      </p>
+    } @else {
+      <p class="hero-value muted">-</p>
+      <p class="hero-error">{{ pvgisError() ?? 'Annual production is unavailable.' }}</p>
+    }
+  </section>
+
+  <div class="metrics">
+    <article class="metric">
+      <p class="metric-label">Roof area</p>
+      <p class="metric-value">{{ res.roofAreaM2 | number: '1.0-1' }} <span class="metric-unit">m²</span></p>
+      <p class="metric-note">Full outline traced on the map</p>
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Obstacles</p>
+      <p class="metric-value">{{ res.obstacleAreaM2 | number: '1.0-1' }} <span class="metric-unit">m²</span></p>
+      <p class="metric-note">Subtracted from the roof area</p>
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Available area</p>
+      <p class="metric-value">{{ res.availableAreaM2 | number: '1.0-1' }} <span class="metric-unit">m²</span></p>
+      <p class="metric-note">Roof minus obstacles</p>
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Usable area</p>
+      <p class="metric-value">{{ res.usableAreaM2 | number: '1.0-1' }} <span class="metric-unit">m²</span></p>
+      <p class="metric-note">{{ constants.usableRoofFactor * 100 }}% of available</p>
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Panels</p>
+      <p class="metric-value">{{ res.panelCount | number: '1.0-0' }}</p>
+      <p class="metric-note">{{ constants.panelPowerWp }} Wp &middot; {{ constants.panelAreaM2 }} m² each</p>
+    </article>
+
+    <article class="metric accent">
+      <p class="metric-label">System size</p>
+      <p class="metric-value">{{ res.systemPowerKwp | number: '1.1-2' }} <span class="metric-unit">kWp</span></p>
+      <p class="metric-note">Total installed capacity</p>
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Specific yield</p>
+      @if (res.specificYieldKwhPerKwp !== null) {
+        <p class="metric-value">{{ res.specificYieldKwhPerKwp | number: '1.0-0' }} <span class="metric-unit">kWh/kWp</span></p>
+        <p class="metric-note">Production per installed kWp</p>
+      } @else {
+        <p class="metric-value muted">-</p>
+        <p class="metric-note">Needs PVGIS production</p>
+      }
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Orientation</p>
+      <p class="metric-value">{{ res.tiltDeg }}&deg; <span class="metric-unit">/ {{ res.aspectDeg }}&deg;</span></p>
+      <p class="metric-note">Tilt / aspect used</p>
+    </article>
+
+    <article class="metric">
+      <p class="metric-label">Estimated price</p>
+      <p class="metric-value">&euro;{{ res.estimatedPriceEur | number: '1.0-0' }}</p>
+      <p class="metric-note">&euro;{{ constants.estimatedPricePerKwpEur }} / kWp installed</p>
+    </article>
+  </div>
+
+  <section class="contact">
+    <p class="contact-title">Your details <span class="opt">(optional)</span></p>
+    <div class="contact-grid">
+      <label class="field">
+        <span class="field-label">Name</span>
+        <input
+          class="text-input"
+          type="text"
+          autocomplete="name"
+          placeholder="Your name"
+          [ngModel]="contactName()"
+          (ngModelChange)="contactName.set($event)"
+        />
+      </label>
+      <label class="field">
+        <span class="field-label">Email</span>
+        <input
+          class="text-input"
+          type="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          [ngModel]="contactEmail()"
+          (ngModelChange)="contactEmail.set($event)"
+        />
+      </label>
+      <label class="field">
+        <span class="field-label">Phone</span>
+        <input
+          class="text-input"
+          type="tel"
+          autocomplete="tel"
+          placeholder="+385 91 234 5678"
+          [ngModel]="contactPhone()"
+          (ngModelChange)="contactPhone.set($event)"
+        />
+      </label>
+    </div>
+
+    @if (hasContact()) {
+      <dl class="contact-summary">
+        @if (contactName().trim()) {
+          <div class="contact-row"><dt>Name</dt><dd>{{ contactName() }}</dd></div>
+        }
+        @if (contactEmail().trim()) {
+          <div class="contact-row"><dt>Email</dt><dd>{{ contactEmail() }}</dd></div>
+        }
+        @if (contactPhone().trim()) {
+          <div class="contact-row"><dt>Phone</dt><dd>{{ contactPhone() }}</dd></div>
+        }
+      </dl>
+    }
+
+    <p class="contact-note">
+      Shown in your summary only. This demo does not send data anywhere.
+    </p>
+  </section>
+
+  <footer class="dash-foot">
+    <p class="assumptions">
+      Rough estimate only. Assumes {{ constants.usableRoofFactor * 100 }}% usable roof and panels at
+      {{ res.tiltDeg }}&deg; tilt / {{ res.aspectDeg }}&deg; aspect, and does not account for shading
+      beyond the obstacles you drew.
+    </p>
+    <button type="button" class="btn-primary" (click)="restart.emit()">Start over</button>
+  </footer>
+</div>

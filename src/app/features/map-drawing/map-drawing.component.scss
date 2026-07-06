@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.map-canvas {
+  width: 100%;
+  height: clamp(360px, 58vh, 620px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b0f16;
+}
