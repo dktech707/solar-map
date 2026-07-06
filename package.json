@@ -1,0 +1,65 @@
+{
+  "name": "solar-map",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "server": "node server/index.js",
+    "dev": "concurrently -k -n client,server -c cyan,magenta \"ng serve\" \"node server/index.js\"",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
+    "verify": "npm run build && node --check server/index.js && node --check server/geocode.js && node --check server/pvgis.js && node --check server/lib.js"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/forms": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "@turf/area": "^7.3.5",
+    "@turf/boolean-contains": "^7.3.5",
+    "@turf/boolean-disjoint": "^7.3.5",
+    "@turf/helpers": "^7.3.5",
+    "@turf/kinks": "^7.3.5",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.31",
+    "@angular/cli": "^20.3.31",
+    "@angular/compiler-cli": "^20.3.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/jasmine": "~5.1.0",
+    "@types/leaflet": "1.9",
+    "@types/leaflet-draw": "^1.0.13",
+    "concurrently": "^9.2.3",
+    "jasmine-core": "~5.9.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.9.2"
+  }
+}
