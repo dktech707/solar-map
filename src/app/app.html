@@ -1,0 +1,34 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+        <circle cx="12" cy="12" r="5" fill="var(--accent)" />
+        <g stroke="var(--accent)" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1.5" x2="12" y2="4.5" />
+          <line x1="12" y1="19.5" x2="12" y2="22.5" />
+          <line x1="1.5" y1="12" x2="4.5" y2="12" />
+          <line x1="19.5" y1="12" x2="22.5" y2="12" />
+          <line x1="4.4" y1="4.4" x2="6.5" y2="6.5" />
+          <line x1="17.5" y1="17.5" x2="19.6" y2="19.6" />
+          <line x1="4.4" y1="19.6" x2="6.5" y2="17.5" />
+          <line x1="17.5" y1="6.5" x2="19.6" y2="4.4" />
+        </g>
+      </svg>
+      <div class="brand-text">
+        <h1 class="brand-title">Solar Roof Estimator</h1>
+        <p class="brand-tagline">Draw a roof, size the array, see the yield.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <app-solar-wizard />
+  </main>
+
+  <footer class="app-footer">
+    <p>
+      Powered by OpenStreetMap Nominatim, Esri World Imagery, Turf.js and the EU PVGIS API.
+      Estimates are indicative only, not a formal quote.
+    </p>
+  </footer>
+</div>
