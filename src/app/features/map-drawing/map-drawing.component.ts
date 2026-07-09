@@ -114,7 +114,7 @@ export class MapDrawingComponent implements AfterViewInit, OnDestroy {
     map.addLayer(drawnItems);
 
     const drawControl = new L.Control.Draw({
-      position: 'topright',
+      position: 'topleft', // matches the SolarShop reference layout
       draw: {
         polygon: {
           allowIntersection: false,

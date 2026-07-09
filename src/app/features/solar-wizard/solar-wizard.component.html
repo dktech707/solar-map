@@ -1,19 +1,29 @@
 <div class="wizard">
-  <ol class="stepper" aria-label="Progress">
-    <li [class.active]="isActive('address')" [class.done]="isDone('address')">
-      <span class="dot">1</span><span class="label">Address</span>
+  <ol class="stepper" aria-label="Napredak">
+    <li class="step" [class.active]="isActive('address')" [class.done]="isDone('address')">
+      <span class="num">01</span><span class="label">Adresa</span>
     </li>
-    <li [class.active]="isActive('roof')" [class.done]="isDone('roof')">
-      <span class="dot">2</span><span class="label">Roof</span>
+    <li class="step" [class.active]="isActive('roof')" [class.done]="isDone('roof')">
+      <span class="num">02</span><span class="label">Krov</span>
     </li>
-    <li [class.active]="isActive('obstacles')" [class.done]="isDone('obstacles')">
-      <span class="dot">3</span><span class="label">Obstacles</span>
+    <li class="step" [class.active]="isActive('obstacles')" [class.done]="isDone('obstacles')">
+      <span class="num">03</span><span class="label">Prepreke</span>
     </li>
-    <li [class.active]="isActive('production')" [class.done]="isDone('production')">
-      <span class="dot">4</span><span class="label">Production</span>
+    <li class="step" [class.active]="isActive('production')" [class.done]="isDone('production')">
+      <span class="num">04</span><span class="label">Paneli</span>
     </li>
-    <li [class.active]="isActive('result')" [class.done]="isDone('result')">
-      <span class="dot">5</span><span class="label">Result</span>
+    <li class="step" [class.active]="isActive('result')">
+      <span class="num">05</span><span class="label">Nadzorna ploča</span>
+    </li>
+    <li class="step" [class.active]="isActive('result')">
+      <span class="num">06</span><span class="label">Osobni podaci</span>
+    </li>
+    <li class="step-final" [class.done]="isActive('result')" aria-hidden="true">
+      <span class="check">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      </span>
     </li>
   </ol>
 
@@ -24,22 +34,40 @@
         <p class="panel-sub">Search for an address to place it on the satellite map.</p>
 
         <div class="search-row">
-          <input
-            class="text-input"
-            type="text"
-            [(ngModel)]="query"
-            (keydown.enter)="search()"
-            placeholder="e.g. Ilica 1, Zagreb"
-            aria-label="Property address"
-          />
-          <button
-            type="button"
-            class="btn-primary"
-            (click)="search()"
-            [disabled]="searching() || query.trim().length < minQueryLength"
-          >
-            {{ searching() ? 'Searching…' : 'Search' }}
+          <button type="button" class="icon-btn" aria-label="Pretraga na karti">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="10" r="4.5" />
+              <line x1="14.6" y1="13.6" x2="18" y2="17" />
+              <path d="M4 20.5V6.2l5-2.2 6 2.2 5-2.2v6" />
+            </svg>
           </button>
+
+          <div class="search-bar">
+            <span class="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6.5 9 4v13.5L3 20z" />
+                <path d="M9 4l6 2.5V20l-6-2.5z" />
+                <path d="M15 6.5 21 4v13.5L15 20z" />
+                <circle cx="16.5" cy="12.5" r="2" fill="currentColor" stroke="none" />
+              </svg>
+            </span>
+            <input
+              class="search-input"
+              type="text"
+              [(ngModel)]="query"
+              (keydown.enter)="search()"
+              placeholder="Unesite adresu"
+              aria-label="Property address"
+            />
+            <button
+              type="button"
+              class="btn-primary search-btn"
+              (click)="search()"
+              [disabled]="searching() || query.trim().length < minQueryLength"
+            >
+              {{ searching() ? 'Searching…' : 'Search' }}
+            </button>
+          </div>
         </div>
 
         @if (query.trim().length > 0 && query.trim().length < minQueryLength) {
@@ -66,6 +94,21 @@
         } @else if (hasSearched() && !searching() && !searchError()) {
           <p class="msg">No matching addresses. Try adding a city or country.</p>
         }
+
+        <div class="map-placeholder">
+          <div class="map-overlay">
+            <span class="overlay-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5" />
+                <path d="M4 10.5V20a1 1 0 0 0 1 1h3" />
+                <circle cx="13" cy="14" r="3.2" />
+                <line x1="15.4" y1="16.4" x2="18" y2="19" />
+              </svg>
+            </span>
+            <p class="overlay-title">Prvo unesite svoju adresu</p>
+            <p class="overlay-sub">Satelitska karta prikazuje se nakon odabira adrese.</p>
+          </div>
+        </div>
       </section>
     }
 
@@ -82,23 +125,35 @@
               </p>
             } @else {
               <p class="panel-sub">
-                Pick the polygon tool at the top-right of the map, click each corner of the roof,
+                Pick the polygon tool at the top-left of the map, click each corner of the roof,
                 then close the shape on the first point.
               </p>
             }
           </div>
-          <button type="button" class="btn-ghost" (click)="backToSearch()">Change address</button>
         </div>
 
         @if (location(); as loc) {
-          <app-map-drawing
-            [center]="loc"
-            [initialRoof]="roof()?.feature ?? null"
-            [initialObstacles]="obstacleFeatures()"
-            (roofChange)="onRoofChange($event)"
-            (obstaclesChange)="onObstaclesChange($event)"
-            (notice)="onNotice($event)"
-          />
+          <div class="address-bar">
+            <span class="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </svg>
+            </span>
+            <p class="address-text">{{ loc.displayName }}</p>
+            <button type="button" class="btn-ghost" (click)="backToSearch()">Change address</button>
+          </div>
+
+          <div class="map-frame">
+            <app-map-drawing
+              [center]="loc"
+              [initialRoof]="roof()?.feature ?? null"
+              [initialObstacles]="obstacleFeatures()"
+              (roofChange)="onRoofChange($event)"
+              (obstaclesChange)="onObstaclesChange($event)"
+              (notice)="onNotice($event)"
+            />
+          </div>
         }
 
         @if (mapNotice(); as note) {

@@ -23,8 +23,6 @@ describe('App', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     // The template renders the title inside `.brand-title`.
-    expect(compiled.querySelector('.brand-title')?.textContent).toContain(
-      'Solar Roof Estimator',
-    );
+    expect(compiled.querySelector('.brand-title')?.textContent).toContain('SolarShop');
   });
 });

@@ -2,89 +2,142 @@
   display: block;
 }
 
+/* Large rounded wizard container */
 .wizard {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
+  padding: 2rem 2rem 2.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--wizard-bg);
+  box-shadow: var(--shadow-md);
 }
 
-/* Stepper */
+/* ---- Stepper (01 .. 06 + final check) ---------------------------------- */
 .stepper {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0 0.75rem;
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
-.stepper li {
+.step {
+  position: relative;
   flex: 1 1 0;
-  min-width: 90px;
+  min-width: 104px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.6rem 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 500;
+  gap: 0.1rem;
+  text-align: center;
 }
 
-.stepper .dot {
+/* thin connector between steps, aligned with the numbers */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 1.5rem;
+  left: calc(50% + 2.4rem);
+  right: calc(-50% + 2.4rem);
+  height: 1px;
+  background: var(--border-strong);
+}
+
+/* the first gap uses an orange chevron instead of a line */
+.step:first-of-type::after {
+  content: '\203A';
+  height: auto;
+  background: none;
+  top: 0.55rem;
+  color: var(--accent);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.step .num {
+  font-size: clamp(1.9rem, 3vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.step .label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* active step: orange number and label */
+.step.active .num,
+.step.active .label {
+  color: var(--accent);
+}
+
+.step.active .label {
+  font-weight: 600;
+}
+
+/* completed steps stay dark */
+.step.done .num,
+.step.done .label {
+  color: var(--text);
+}
+
+/* trailing check tile */
+.step-final {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  padding-left: 0.5rem;
+}
+
+.step-final .check {
   display: grid;
   place-items: center;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  background: var(--surface-2);
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 700;
-  flex: none;
-}
-
-.stepper li.active {
-  border-color: var(--accent);
-  color: var(--text);
-}
-
-.stepper li.active .dot {
-  background: var(--accent);
-  color: #1a1206;
-}
-
-.stepper li.done {
-  color: var(--text);
-}
-
-.stepper li.done .dot {
-  background: rgba(52, 211, 153, 0.2);
-  color: var(--success);
-}
-
-/* Panels */
-.panel {
-  padding: 1.4rem 1.4rem 1.5rem;
-  border: 1px solid var(--border);
+  width: 3rem;
+  height: 3rem;
   border-radius: 14px;
   background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.14s ease;
+}
+
+.step-final.done .check {
+  color: var(--text);
+  box-shadow: var(--shadow-sm), 0 0 0 5px var(--accent-soft);
+}
+
+/* ---- Panels ------------------------------------------------------------ */
+.panel {
+  padding: 1.6rem 1.6rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .panel-title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 
 .panel-sub {
-  margin: 0.35rem 0 1.1rem;
+  margin: 0.4rem 0 1.25rem;
   font-size: 0.9rem;
   color: var(--text-muted);
-  max-width: 60ch;
+  max-width: 66ch;
 }
 
 .panel-head-row {
@@ -92,25 +145,148 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
-.panel-head-row .panel-sub {
-  margin-bottom: 0;
-}
-
-/* Search */
+/* ---- Address search row ------------------------------------------------- */
 .search-row {
   display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.9rem;
 }
 
-.text-input {
-  /* Visual styling is global (see styles.scss); this keeps the search-row sizing. */
-  flex: 1 1 240px;
+.icon-btn {
+  flex: none;
+  width: 3.5rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--accent);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.14s ease;
 }
 
+.icon-btn:hover {
+  border-color: var(--accent);
+}
+
+.search-bar {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.35rem 0.35rem 1rem;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+}
+
+.search-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--accent);
+}
+
+.search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.7rem 0;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: color-mix(in srgb, var(--text-muted) 65%, transparent);
+}
+
+.search-btn {
+  flex: none;
+  border-radius: 9px;
+  padding: 0.65rem 1.2rem;
+}
+
+/* ---- Selected-address bar (draw step) ---------------------------------- */
+.address-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 0.35rem 0.35rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+}
+
+.address-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.address-bar .btn-ghost {
+  border-radius: 9px;
+}
+
+/* ---- Map ---------------------------------------------------------------- */
+.map-frame {
+  /* Own stacking context: keeps Leaflet controls (z-index 800) from painting
+     over the sticky top navigation. */
+  position: relative;
+  z-index: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.map-placeholder {
+  position: relative;
+  margin-top: 1.25rem;
+  height: clamp(340px, 50vh, 540px);
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, #3f4a44, #2b3330 55%, #23292b);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.map-overlay {
+  text-align: center;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+}
+
+.overlay-icon {
+  display: block;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.overlay-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.overlay-sub {
+  margin: 0.6rem 0 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- Results ------------------------------------------------------------ */
 .results {
   list-style: none;
   margin: 1rem 0 0;
@@ -126,22 +302,22 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  padding: 0.7rem 0.85rem;
+  padding: 0.8rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--bg);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.12s ease, background 0.12s ease;
+  transition: border-color 0.14s ease, background 0.14s ease;
 }
 
 .result-item:hover {
   border-color: var(--accent);
-  background: var(--surface-2);
+  background: var(--accent-soft);
 }
 
 .result-name {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   line-height: 1.35;
 }
 
@@ -151,27 +327,21 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Draw actions */
+/* ---- Draw actions ------------------------------------------------------- */
 .draw-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
 }
 
-.area-badge {
-  font-size: 0.9rem;
-  color: var(--text-muted);
+.draw-actions .btn-primary {
+  margin-left: auto;
 }
 
-.area-badge strong {
-  color: var(--success);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Messages */
+/* ---- Messages ----------------------------------------------------------- */
 .msg {
   margin: 0.9rem 0 0;
   font-size: 0.85rem;
@@ -182,12 +352,12 @@
   color: var(--danger);
 }
 
-/* PVGIS settings (tilt / azimuth) */
+/* ---- PVGIS settings (tilt / azimuth) ------------------------------------ */
 .pv-settings {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 0.9rem;
-  margin-top: 1.1rem;
+  margin-top: 1.25rem;
 }
 
 .pv-settings .field {
@@ -212,16 +382,16 @@
   color: var(--text-muted);
 }
 
-/* Live area readout on the draw/obstacles step */
+/* ---- Live area readout on the draw/obstacles step ----------------------- */
 .live-metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 0.6rem 1rem;
-  margin: 1.1rem 0 0;
-  padding: 0.9rem 1rem;
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.15rem;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
 }
 
 .live-metrics div {
@@ -239,38 +409,31 @@
 
 .live-metrics dd {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
+  font-weight: 600;
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 
-/* Final UI polish: keep numeric PVGIS fields compact and make disabled actions visibly inactive. */
-.pv-settings .text-input {
-  min-height: 44px;
-  height: 44px;
-  padding: 0 0.9rem;
-}
+@media (max-width: 640px) {
+  .wizard {
+    padding: 1.25rem 1rem 1.5rem;
+    border-radius: var(--radius-md);
+  }
 
-button:disabled,
-.btn-primary:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  filter: grayscale(0.35);
-}
+  .panel {
+    padding: 1.1rem 1rem 1.25rem;
+  }
 
-.pv-settings .field input.text-input {
-  flex: 0 0 44px;
-  width: 100%;
-  height: 44px;
-  min-height: 44px;
-  max-height: 44px;
-  padding: 0 0.9rem;
-  box-sizing: border-box;
-}
+  .search-bar,
+  .address-bar {
+    flex-wrap: wrap;
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+  }
 
-button:disabled,
-.btn-primary:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  filter: grayscale(0.35);
+  .search-btn,
+  .address-bar .btn-ghost {
+    width: 100%;
+  }
 }

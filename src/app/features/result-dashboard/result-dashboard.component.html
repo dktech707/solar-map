@@ -65,7 +65,7 @@
       <p class="metric-note">Total installed capacity</p>
     </article>
 
-    <article class="metric">
+    <article class="metric success">
       <p class="metric-label">Specific yield</p>
       @if (res.specificYieldKwhPerKwp !== null) {
         <p class="metric-value">{{ res.specificYieldKwhPerKwp | number: '1.0-0' }} <span class="metric-unit">kWh/kWp</span></p>
@@ -82,7 +82,7 @@
       <p class="metric-note">Tilt / aspect used</p>
     </article>
 
-    <article class="metric">
+    <article class="metric accent">
       <p class="metric-label">Estimated price</p>
       <p class="metric-value">&euro;{{ res.estimatedPriceEur | number: '1.0-0' }}</p>
       <p class="metric-note">&euro;{{ constants.estimatedPricePerKwpEur }} / kWp installed</p>
